@@ -43,8 +43,7 @@ def calculate_average(raw_arr, key_name):
 
     return average
 
-def calculate_adm1_monthly_average(iso3, start_date, end_date):
-    raw_data = get_data(iso3, start_date, end_date)
+def calculate_adm1_monthly_average(raw_data):
     adm1_data = organize_by_admin1(raw_data)
     out = []
     for k, v in adm1_data.items():
@@ -83,24 +82,33 @@ def calculate_national_estimate_variance(raw_data, national_prevalence_estimate)
 
     return variance
 
-def calculate_daily_national_estimate(iso3, start_date, end_date):
+def calculate_daily_national_metrics(raw_data):
+    date_key = organize_by_date(raw_data, 'date')
+    data = {}
+    for k, v in date_key.items():
+        tot_people, national_esitmate = calculate_national_estimate(v)
+        variance = calculate_national_estimate_variance(v, national_esitmate)
+        data[k] = {
+            'people': tot_people,
+            'prevalence': national_esitmate,
+            'variance': variance
+        }
+    return data
+
+def calculate_metrics(iso3, start_date, end_date):
     try:
         raw_data = get_data(iso3, start_date, end_date)
-        date_key = organize_by_date(raw_data, 'date')
-        data = {}
-        for k, v in date_key.items():
-            tot_people, national_esitmate = calculate_national_estimate(v)
-            variance = calculate_national_estimate_variance(v, national_esitmate)
-            data[k] = {
-                'people': tot_people,
-                'prevalence': national_esitmate,
-                'variance': variance
-            }
-        return data
+        metric_a = calculate_adm1_monthly_average(raw_data)
+        metric_b = calculate_daily_national_metrics(raw_data)
+        return {
+            'metric_a': metric_a,
+            'metric_b': metric_b
+        }
+
     except:
         return
 
-def get_estimated_data(iso3):
+def get_metrics_data(iso3):
     try:
         return calculate_daily_national_estimate(iso3, '2022-06-01', '2023-06-01')
     except:
@@ -109,8 +117,8 @@ def get_estimated_data(iso3):
             return data[iso3]
 
 def lambda_handler(event, context):
-    COL_data = get_estimated_data('COL')
-    BFA_data = get_estimated_data('BFA')
+    COL_data = get_metrics_data('COL')
+    BFA_data = get_metrics_data('BFA')
     return {
         'statusCode': 200,
         'headers': {
