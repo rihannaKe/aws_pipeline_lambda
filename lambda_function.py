@@ -116,8 +116,8 @@ def get_metrics_data(iso3, start_date, end_date):
 
 def lambda_handler(event, context):
     start_date, end_date = '2022-06-01', '2023-06-01'
-    COL_data = get_metrics_data('COL')
-    BFA_data = get_metrics_data('BFA')
+    COL_data = get_metrics_data('COL', start_date, end_date)
+    BFA_data = get_metrics_data('BFA', start_date, end_date)
     return {
         'statusCode': 200,
         'headers': {
