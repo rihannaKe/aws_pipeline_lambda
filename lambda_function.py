@@ -10,7 +10,6 @@ def get_data(iso3, start_date, end_date):
     response_json = response.json()
     return response_json
 
-
 def organize_by_admin1(raw_arr):
     out = {}
     for d in raw_arr:
@@ -104,19 +103,19 @@ def calculate_metrics(iso3, start_date, end_date):
             'metric_a': metric_a,
             'metric_b': metric_b
         }
-
     except:
         return
 
-def get_metrics_data(iso3):
+def get_metrics_data(iso3, start_date, end_date):
     try:
-        return calculate_daily_national_estimate(iso3, '2022-06-01', '2023-06-01')
+        return calculate_metrics(iso3, start_date, end_date)
     except:
         with open('last_calculated_data.json', 'r') as f:
             data = json.load(f)
             return data[iso3]
 
 def lambda_handler(event, context):
+    start_date, end_date = '2022-06-01', '2023-06-01'
     COL_data = get_metrics_data('COL')
     BFA_data = get_metrics_data('BFA')
     return {
@@ -134,4 +133,3 @@ def lambda_handler(event, context):
         )
     }
 
-# print(lambda_handler(None,None))
