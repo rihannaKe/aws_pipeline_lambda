@@ -4,7 +4,6 @@ from collections import defaultdict
 from datetime import datetime
 
 
-
 def lambda_handler(event, context):
     return {
         'statusCode': 200,
