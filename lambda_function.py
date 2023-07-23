@@ -99,15 +99,14 @@ def calculate_metrics(iso3, start_date, end_date):
         raw_data = get_data(iso3, start_date, end_date)
         metric_a = calculate_adm1_monthly_average(raw_data)
         metric_b = calculate_daily_national_metrics(raw_data)
-        return {
-            'metric_a': metric_a,
-            'metric_b': metric_b
-        }
     except:
-        return
+        metric_a , metric_b = None, None
+    finally:
+        return { 'metric_a': metric_a, 'metric_b': metric_b}
 
 def get_metrics_data(iso3, start_date, end_date):
     try:
+        # First, try to call the `calculate_metrics()` function to calculate the metrics data.
         return calculate_metrics(iso3, start_date, end_date)
     except:
         with open('last_calculated_data.json', 'r') as f:
